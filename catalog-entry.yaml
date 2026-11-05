@@ -1,7 +1,6 @@
 name: atlas
 repo: https://github.com/okyssta/hermes-atlas
-# sha is pinned at catalog admission — placeholder until the first push:
-# sha: 0000000000000000000000000000000000000000
+sha: 21c7656e74982bffb34bc6ce62f3d13cb22df187
 description: >-
   A local registry of the user's coding projects that tells the agent exactly how
   to install, test, lint, build and run each one. Atlas scans the folders people
