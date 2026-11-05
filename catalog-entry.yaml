@@ -1,0 +1,40 @@
+name: atlas
+repo: https://github.com/okyssta/hermes-atlas
+# sha is pinned at catalog admission — placeholder until the first push:
+# sha: 0000000000000000000000000000000000000000
+description: >-
+  A local registry of the user's coding projects that tells the agent exactly how
+  to install, test, lint, build and run each one. Atlas scans the folders people
+  keep code in, detects each project's stack from its marker files (Python with
+  uv/Poetry/Pipenv/pip, Node with npm/pnpm/yarn/bun, Rust, Go, Java/Maven/Gradle,
+  Ruby, PHP, docker compose, Makefile targets) and records the commands those
+  markers declare — each with the file that justifies it. It also reads the
+  README title, git branch and last commit (from .git files, never by running
+  git), the names of .env files, dev-server ports and compose services. When a
+  session starts inside a known project, a bounded card (name, stack, exact
+  commands) is injected into the system prompt, so the agent stops guessing
+  `npm test` in a uv project. Four tools (project_list, project_info,
+  project_commands, project_refresh) and a /atlas command expose the same index.
+  Detection executes nothing and writes nothing inside the scanned projects.
+  Disclosure — reads marker files (pyproject.toml, package.json, Cargo.toml,
+  go.mod, pom.xml, Gemfile, composer.json, Makefile, compose files, README,
+  .git/HEAD, .git/logs/HEAD) under the configured roots; lists .env file names
+  without opening them; writes one SQLite database under the profile's
+  plugin-data/atlas/; runs no project code, no git and no package manager during
+  detection; no network calls, no telemetry.
+maintainer: okyssta
+tier: community
+category: tools
+requires_hermes: ">=0.22.0"
+version: "1.0.0"
+docs_url: https://github.com/okyssta/hermes-atlas#readme
+platforms: []
+capabilities:
+  provides_tools:
+    - project_list
+    - project_info
+    - project_commands
+    - project_refresh
+  provides_hooks: []
+  provides_middleware: []
+  requires_env: []

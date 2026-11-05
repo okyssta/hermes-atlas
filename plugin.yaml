@@ -1,0 +1,87 @@
+name: atlas
+label: Atlas
+version: 1.0.0
+manifest_version: 2
+api_version: 1
+license: MIT
+homepage: https://github.com/okyssta/hermes-atlas
+author: kyssta
+requires_hermes: ">=0.22.0"
+description: >
+  A local registry of the user's coding projects that tells the agent exactly how
+  to install, test, lint, build and run each one. Atlas scans the folders people
+  keep code in (the session's cwd plus ~/code, ~/projects, ~/src, ~/work, ~/repos),
+  detects each project's stack from its marker files — Python with uv, Poetry,
+  Pipenv or pip; Node with npm, pnpm, yarn or bun; Rust, Go, Java/Maven/Gradle,
+  Ruby, PHP, docker compose, Makefile targets — and records the exact commands
+  those markers declare, each with the file that justifies it. It also reads the
+  project's README title, git branch and last commit (by reading .git files, never
+  by running git), the NAMES of .env files, detected dev-server ports and compose
+  services. When a session starts inside a known project, a compact card with that
+  project's exact commands is injected into the system prompt, so the agent stops
+  guessing `npm test` in a uv project or inventing a dev-server port. Four tools
+  (project_list, project_info, project_commands, project_refresh) and a /atlas
+  command expose the same index. Nothing is executed during detection and nothing
+  is written into the scanned projects. Disclosure — reads marker files
+  (pyproject.toml, package.json, Cargo.toml, go.mod, pom.xml, Gemfile,
+  composer.json, Makefile, docker compose files, README, .git/HEAD and
+  .git/logs/HEAD) under the configured project roots, plus directory names for the
+  layout summary; .env files are listed by name only and their contents are never
+  opened; writes one SQLite database under the profile's plugin-data/atlas/ and
+  nothing else; executes no project code, no git and no package manager during
+  detection; makes no network calls and has no telemetry.
+tags: [projects, workflow, local, detection, commands, developer-experience, session-context, privacy]
+
+provides_tools:
+  - project_list
+  - project_info
+  - project_commands
+  - project_refresh
+
+provides_hooks: []
+
+config_schema:
+  enabled:
+    type: bool
+    default: true
+    label: Enabled
+    description: Index projects and answer atlas queries
+  roots:
+    type: list
+    default: []
+    label: Project roots
+    description: >-
+      Directories scanned for projects. Empty means auto-detect: the session's
+      working directory plus every existing folder among ~/code, ~/projects,
+      ~/src, ~/work and ~/repos
+  max_depth:
+    type: int
+    default: 3
+    label: Scan depth
+    description: How many directory levels below each root are walked (1-8)
+  max_projects:
+    type: int
+    default: 500
+    label: Project cap
+    description: Stop the scan after this many projects (1-5000)
+  scan_seconds:
+    type: float
+    default: 6.0
+    label: Scan time budget (seconds)
+    description: >-
+      Wall-clock limit for one root walk. A scan that hits it is reported as
+      partial rather than silently truncated (0.5-60)
+  cache_ttl_minutes:
+    type: int
+    default: 60
+    label: Cache lifetime (minutes)
+    description: >-
+      How long an indexed project is served before a lookup re-detects it. 0
+      re-detects on every lookup
+  inject_prompt_section:
+    type: bool
+    default: true
+    label: Session card
+    description: >-
+      Inject a short project card (name, stack, exact commands) into the system
+      prompt when the session starts inside a known project
